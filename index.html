@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a121d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Badr Vault">
+  <meta name="description" content="An offline personal password vault. All saved entries are encrypted on this device.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; manifest-src 'self'; worker-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="app.css">
+  <script src="app.js" defer></script>
+  <title>Badr Vault · Private password manager</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-bar">
+      <div class="brand"><span class="brand-icon" aria-hidden="true">✦</span><span>BADR<span class="brand-muted">VAULT</span></span></div>
+      <span class="local-pill"><span class="live-dot"></span> LOCAL & ENCRYPTED</span>
+    </header>
+
+    <main id="unavailable" class="auth-screen hidden" aria-live="polite">
+      <div class="auth-card"><div class="hero-icon">!</div><h1>Secure browser required</h1><p>This vault needs an HTTPS connection and a browser that supports Web Crypto and local storage. Open the published HTTPS link in Safari.</p></div>
+    </main>
+
+    <main id="auth-screen" class="auth-screen hidden">
+      <div class="hero-icon" aria-hidden="true"><span>✧</span></div>
+      <div class="eyebrow">YOUR PRIVATE SPACE</div>
+      <h1 id="auth-title">Your digital safe.</h1>
+      <p class="auth-subtitle" id="auth-subtitle">All passwords stay encrypted on this device. Only your master password can unlock them.</p>
+      <form id="auth-form" autocomplete="off">
+        <label for="master">Master password</label>
+        <div class="password-wrap"><input id="master" type="password" name="badr-master" minlength="12" placeholder="Enter your master password" spellcheck="false" autocapitalize="off" autocomplete="off" required><button type="button" class="eye-btn" id="toggle-master" aria-label="Show or hide master password">Show</button></div>
+        <div id="confirm-wrap" class="hidden"><label for="master-confirm">Confirm master password</label><input id="master-confirm" type="password" name="badr-master-confirm" placeholder="Type it again" autocomplete="off" spellcheck="false" autocapitalize="off"></div>
+        <div class="error-text hidden" id="auth-error" role="alert"></div>
+        <button type="submit" class="primary-btn full" id="auth-submit">Unlock vault <span aria-hidden="true">→</span></button>
+      </form>
+      <div class="auth-note"><span>◆</span> Your master password is never stored. If you forget it and have no usable backup, your passwords cannot be recovered.</div>
+      <button type="button" class="text-link" id="auth-import">Restore encrypted backup</button>
+    </main>
+
+    <main id="main-screen" class="hidden">
+      <section id="page-vault" class="page">
+        <div class="section-head"><div><div class="eyebrow">PERSONAL PASSWORD MANAGER</div><h1>Your vault<span class="accent">.</span></h1><p class="muted">Everything you need, kept private.</p></div><button id="header-lock" type="button" class="icon-button" aria-label="Lock vault" title="Lock vault">⌁</button></div>
+        <div class="summary-card"><div class="summary-top"><span>YOUR SECURE VAULT</span><span class="shield-label">● PROTECTED</span></div><div class="summary-count"><span id="entry-count">0</span><span class="count-caption">saved accounts</span></div><div class="summary-footer"><span>Encrypted directly on this iPhone</span><span class="lock-illustration">▣</span></div></div>
+        <div class="section-title"><h2>Passwords</h2><button class="mini-add" id="add-top" type="button">+ Add new</button></div>
+        <div class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search accounts, emails or websites" autocomplete="off" aria-label="Search passwords"></div>
+        <div class="filter-row"><button type="button" class="filter active" data-filter="all">All accounts</button><button type="button" class="filter" data-filter="favorites">★ Favorites</button></div>
+        <div id="entry-list" class="entry-list" aria-live="polite"></div>
+        <div id="empty-state" class="empty-state hidden"><div class="empty-icon">✦</div><h3>No passwords here yet</h3><p>Add your first login to begin building your encrypted vault.</p><button type="button" id="empty-add" class="secondary-btn">+ Add an account</button></div>
+      </section>
+      <section id="page-generator" class="page hidden">
+        <div class="section-head"><div><div class="eyebrow">PASSWORD STUDIO</div><h1>Generate<span class="accent">.</span></h1><p class="muted">Unique, unpredictable, yours.</p></div></div>
+        <div class="panel"><div class="panel-heading">YOUR NEW PASSWORD</div><div class="generated-wrap"><input id="generated-password" type="text" aria-label="Generated password" readonly spellcheck="false" autocomplete="off"><button type="button" id="gen-copy" class="copy-icon" aria-label="Copy generated password">⧉</button></div><div class="strength-row"><span class="strength-bars"><i></i><i></i><i></i><i></i></span><span id="strength-label">Strong random password</span></div></div>
+        <div class="panel controls-panel"><div class="range-title"><label for="gen-length">Password length</label><output id="gen-length-value">20</output></div><input id="gen-length" type="range" min="12" max="64" value="20"><div class="range-ends"><span>12</span><span>64</span></div><div class="line"></div><label class="switch-row"><span>Uppercase letters <small>A B C</small></span><input type="checkbox" id="opt-upper" checked><span class="toggle-ui"></span></label><label class="switch-row"><span>Lowercase letters <small>a b c</small></span><input type="checkbox" id="opt-lower" checked><span class="toggle-ui"></span></label><label class="switch-row"><span>Numbers <small>0 1 2</small></span><input type="checkbox" id="opt-numbers" checked><span class="toggle-ui"></span></label><label class="switch-row"><span>Symbols <small>! @ #</small></span><input type="checkbox" id="opt-symbols" checked><span class="toggle-ui"></span></label></div>
+        <button id="gen-again" type="button" class="primary-btn full">↻ Generate new password</button><button id="gen-save" type="button" class="secondary-btn full">Save this password to vault</button>
+        <p class="tip">Generated with your device's cryptographically secure random number generator. Unsaved passwords are not stored.</p>
+      </section>
+      <section id="page-settings" class="page hidden">
+        <div class="section-head"><div><div class="eyebrow">YOUR CONTROL CENTER</div><h1>Settings<span class="accent">.</span></h1><p class="muted">Your data, your rules.</p></div></div>
+        <div class="panel settings-panel"><h2>Backup & recovery</h2><p>Export an encrypted copy before changing phones, deleting the app or clearing Safari data.</p><button id="export-btn" type="button" class="setting-action"><span><strong>↓ Export encrypted backup</strong><small>Download a .json backup file</small></span><span>↗</span></button><button id="import-btn" type="button" class="setting-action"><span><strong>↑ Restore from backup</strong><small>Replaces this device’s current vault</small></span><span>↗</span></button></div>
+        <div class="panel settings-panel"><h2>Security</h2><p>A master password locks your vault; it is not recoverable. It auto-locks when you leave the app or after 5 minutes of inactivity.</p><button id="change-master" type="button" class="setting-action"><span><strong>Change master password</strong><small>Re-encrypts all saved accounts</small></span><span>↗</span></button><button id="lock-btn" type="button" class="setting-action"><span><strong>Lock now</strong><small>Remove unlocked data from the screen</small></span><span>↗</span></button></div>
+        <div class="privacy-panel"><strong>✦ Private by design</strong><p>No sign-up, no analytics, no cloud sync, and no server account. Your encrypted vault stays in this app's local browser storage. This independent prototype is not security-audited and does not offer native iPhone AutoFill or Face ID.</p></div>
+        <div class="footnote">BADR VAULT · LOCAL EDITION 1.0</div>
+      </section>
+    </main>
+
+    <nav id="bottom-nav" class="bottom-nav hidden" aria-label="Main navigation"><button type="button" class="nav-item active" data-page="vault"><span class="nav-icon">▦</span><span>Vault</span></button><button type="button" class="nav-item" data-page="generator"><span class="nav-icon">✳</span><span>Generator</span></button><button type="button" class="nav-item" data-page="settings"><span class="nav-icon">⚙</span><span>Settings</span></button></nav>
+  </div>
+
+  <div id="editor-backdrop" class="backdrop hidden" role="presentation">
+    <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="editor-title"><div class="sheet-handle"></div><div class="sheet-header"><h2 id="editor-title">New account</h2><button id="close-editor" type="button" class="close-btn" aria-label="Close">×</button></div>
+      <form id="editor-form" autocomplete="off"><input type="hidden" id="edit-id"><label for="edit-title">Account name <span class="req">*</span></label><input id="edit-title" type="text" placeholder="e.g. Gmail, Instagram, Netflix" maxlength="120" required><label for="edit-user">Username or email</label><input id="edit-user" type="text" placeholder="name@example.com" maxlength="250" autocapitalize="off" spellcheck="false"><label for="edit-password">Password <span class="req">*</span></label><div class="password-wrap"><input id="edit-password" type="password" placeholder="Your password" maxlength="512" required autocapitalize="off" spellcheck="false" autocomplete="new-password"><button id="toggle-edit" type="button" class="eye-btn">Show</button></div><button id="editor-generate" type="button" class="inline-generate">✳ Generate strong password</button><label for="edit-site">Website</label><input id="edit-site" type="text" placeholder="example.com" maxlength="300" autocapitalize="off" spellcheck="false"><label for="edit-notes">Notes (optional)</label><textarea id="edit-notes" rows="3" placeholder="Anything worth remembering..." maxlength="2000"></textarea><label class="favorite-check"><input type="checkbox" id="edit-favorite"><span>★ Add to favorites</span></label><button type="submit" id="save-entry" class="primary-btn full">Save encrypted account</button><button type="button" id="delete-entry" class="danger-link hidden">Delete account</button></form>
+    </section>
+  </div>
+  <div id="detail-backdrop" class="backdrop hidden"><section class="sheet detail-sheet" role="dialog" aria-modal="true" aria-labelledby="detail-title"><div class="sheet-handle"></div><div class="sheet-header"><h2 id="detail-title">Account</h2><button type="button" id="close-detail" class="close-btn" aria-label="Close">×</button></div><div id="detail-content"></div><div class="detail-actions"><button type="button" id="detail-edit" class="secondary-btn full">Edit account</button></div></section></div>
+  <div id="change-backdrop" class="backdrop hidden"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="change-title"><div class="sheet-handle"></div><div class="sheet-header"><h2 id="change-title">Change master password</h2><button type="button" id="close-change" class="close-btn" aria-label="Close">×</button></div><form id="change-form" autocomplete="off"><p class="sheet-description">You will use the new password to unlock this vault and any backups made afterward.</p><label for="change-old">Current master password</label><input id="change-old" type="password" required autocomplete="off"><label for="change-new">New master password (12+ characters)</label><input id="change-new" type="password" minlength="12" required autocomplete="off"><label for="change-confirm">Confirm new master password</label><input id="change-confirm" type="password" minlength="12" required autocomplete="off"><div id="change-error" class="error-text hidden" role="alert"></div><button type="submit" id="change-save" class="primary-btn full">Update master password</button></form></section></div>
+  <input id="backup-input" type="file" accept="application/json,.json" class="hidden" aria-label="Select encrypted backup">
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+</body>
+</html>
